@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+    <div class="alert alert-primary" role="alert">
+        <h1 style="text-align: center;">Авторизация</h1>
+    </div>
+    <form action="" method="post" novalidate style="text-align: center;">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username }}<br>
+            {% for error in form.username.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password }}<br>
+            {% for error in form.password.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <a href="/sign_in" class="badge badge-pill badge-success">Зарегестрироваться</a>
+{% endblock %}
