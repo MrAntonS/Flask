@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+	<div class="alert alert-danger" role="alert">
+		Отписаться (просто нажмите на ник разонравившегося человека)
+	</div>
+	{% if friends %}
+	    {% for friend in friends %}
+	    	<a class="badge badge-pill badge-danger" href="/remove_friend/{{friend[1]}}"> {{friend[0]}} </a>
+	    	<br>
+	    {% endfor %}
+	{% else %}
+		<span class="badge badge-pill badge-success">У вас нет друзей!</span>
+	{% endif %}
+{% endblock %}

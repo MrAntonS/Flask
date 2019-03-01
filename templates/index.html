@@ -1,6 +1,15 @@
 {% extends "base.html" %}
  
 {% block content %}
-    <h1>Где-то тут будут новости</h1>
-    <p>{{news}}</p>
+	{%if news%}
+	    {%for new in news%}
+	    	<blockquote class="blockquote">
+	    		<p class="mb-0">{{new[1]}}</p>
+	    		<footer class="blockquote-footer">{{new[0]}}</footer>
+	    	</blockquote>
+	    	<hr>
+    	{%endfor%}
+    {%else%}
+    	<h1>Где-то тут будут новости</h1>
+    {%endif%}
 {% endblock %}

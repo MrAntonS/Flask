@@ -9,9 +9,14 @@
   <body>
     <header>
       <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="#">Новости друзей</a>
+        <span class="badge badge-secondary href="#">Новости друзей</span>
         {% if "username" in session %}
-          <a class="navbar-brand" href="/logout">LOGOUT ({{session['username']}})</a>
+          <div>
+            <a class="badge badge-pill badge-success" href="/users_list">Список пользователей</a>
+            <a class="badge badge-pill badge-success" href="/friends_list">Мои друзья</a>
+            <a class="badge badge-pill badge-success" href="/index">Главная (новости)</a>
+            <a class="badge badge-pill badge-danger" href="/logout">Выйти из аккаунта ({{session['username']}})</a> 
+          </div>
         {% endif %}
       </nav>
     </header>
