@@ -133,7 +133,7 @@ def add_friend(author_id):
     friends_model = FriendsModel(db.get_connection())
     
     if not friends_model.check_friendship(session["user_id"], author_id):
-        friends_model.add_friend(session["user_id"], author_id)
+            friends_model.add_friend(session["user_id"], author_id)
     return redirect("/users_list")
 
 

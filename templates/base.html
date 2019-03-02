@@ -6,10 +6,11 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>{{title}}</title>
 </head>
-  <body>
+  <body class="bg-light">
     <header>
-      <nav class="navbar navbar-light bg-light">
-        <span class="badge badge-secondary href="#">Новости друзей</span>
+      
+      <nav class="navbar navbar-dark bg-dark"> 
+        <span class="badge badge-primary font-weight-bold">&ldquo;Новости Друзей&rdquo;</span>
         {% if "username" in session %}
           <div>
             <a class="badge badge-pill badge-primary" href="/index">Главная (новости)</a>
@@ -19,7 +20,8 @@
             <a class="badge badge-pill badge-danger" href="/del_news">Удалить новость (-и)</a> 
             <a class="badge badge-pill badge-danger" href="/logout">Выйти из аккаунта ({{session['username']}})</a> 
           </div>
-        {% endif %}
+
+          {% endif %}
       </nav>
     </header>
     <!-- Begin page content -->
