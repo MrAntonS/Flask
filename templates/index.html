@@ -4,8 +4,8 @@
 	{%if news%}
 	    {%for new in news%}
 	    	<blockquote class="blockquote">
-	    		<p class="mb-0">{{new[1]}}</p>
-	    		<footer class="blockquote-footer">{{new[0]}}</footer>
+	    		<p class="mb-0"><h1 class="text-center">{{new[1]}}</h1>{{new[2]}}</p>
+	    		<footer class="blockquote-footer text-right">{{new[0]}}</footer>
 	    	</blockquote>
 	    	<hr>
     	{%endfor%}

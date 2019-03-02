@@ -15,16 +15,26 @@ session = {}
 def check():
     if 'username' not in session:
         return True
-#Greeting page
+    return False
+
+
 @app.route('/')
 @app.route('/index')
 def index():
     if check(): return redirect('/login')
     
     users_model = UsersModel(db.get_connection())
-    news = [["1","NEWS"], ["2", "БОЛЬШЕ НОВОСТЕЙ"], ["3", "+"]]#NewsModel(db.get_connection()).get_all(session['user_id'])   
+    friends_model = FriendsModel(db.get_connection())
+    
+    friends_ids = list(map(lambda x: x[2],
+                           friends_model.get_friends(session['user_id'])))
+    
+    news = []
+    for friend_id in friends_ids:
+        news += get_news(friend_id)
+
     if news:
-        news = map(lambda x: [users_model.get_name(x[0]), x[1]], news)
+        news = map(lambda x: [users_model.get_name(x[0]), x[1], x[2]], news)
     return render_template('index.html', username=session['username'],
                            news=news, session=session)
 
@@ -36,9 +46,8 @@ def login():
         user_name = login_form.username.data
         password = login_form.password.data
         users_model = UsersModel(db.get_connection())
+        
         pwd = users_model.get(user_name=user_name)
-        print(user_name, password,sep="||")
-        print(pwd)
         if pwd and pwd[0]:
             if check_password_hash(pwd[2], password):
                 session['username'] = user_name
@@ -63,31 +72,30 @@ def sign_in():
         users_model = UsersModel(db.get_connection())
         if not users_model.get(user_name=user_name):
             #Проверка на свободность логина
+            
             user_id = users_model.insert(user_name, password)
             session['username'] = user_name
             session['user_id'] = user_id
+            
             friends_model = FriendsModel(db.get_connection())
             friends_model.add_friend(1, user_id)
+            friends_model.add_friend(user_id, 1)
+            friends_model.add_friend(user_id, user_id)
+            
             return redirect("/index") 
     return render_template("sign_in.html", title="Зарегестрироваться", form=sign_in_form)
-parser = reqparse.RequestParser()
-parser.add_argument('title', required=True)
-parser.add_argument('content', required=True)
-parser.add_argument('user_id', required=True, type=int)
 
 
 @app.route("/friends_list")
 def friends_list():
     if check(): return redirect('/login')
-    print("S:",session)
+    
     friends_model = FriendsModel(db.get_connection())
     users_model = UsersModel(db.get_connection())
-    
-    friends_ids = friends_model.get_friends_ids(session['user_id'])
-    print("F:",friends_ids)
+    friends_ids = friends_model.get_friends(session['user_id'])
+
     if friends_ids:
-        friends_ids = map(lambda x: [users_model.get_name(x[2]), x[2]], friends_ids)
-        friends = friends_ids
+        friends = map(lambda x: [users_model.get_name(x[2]), x[2]], friends_ids)
         return render_template("friends_list.html", title="Мои друзья", friends=friends, session=session)
     return render_template("friends_list.html", title="Мои друзья", friends=None, session=session)
 
@@ -98,13 +106,24 @@ def remove_friend(author_id):
     
     friends_model = FriendsModel(db.get_connection())
     if friends_model.check_friendship(session["user_id"], author_id):
-        friends_model.remove_friend(session["user_id"], author_id)
-    
+        if session['user_id'] != author_id and str(author_id) != "1":
+            friends_model.remove_friend(session["user_id"], author_id)
     return redirect("/friends_list")
 
+
 @app.route("/users_list")
-def users_list(): #Доделать
-    return redirect("/index")
+def users_list():
+    if check(): return redirect('/login')
+    
+    friends_model = FriendsModel(db.get_connection())
+    users_model = UsersModel(db.get_connection())
+    
+    check_friendship = lambda x: not friends_model.check_friendship(session['user_id'], x)
+    users_ids = users_model.get_all_ids()
+    
+    users = filter(check_friendship, users_ids)
+    users = list(map(lambda x: [users_model.get_name(x), x], users))
+    return render_template("users_list.html", title="С кем бы подружиться?", users=users, session=session)
 
 
 @app.route("/add_friend/<int:author_id>")
@@ -112,11 +131,33 @@ def add_friend(author_id):
     if check(): return redirect('/login')
     
     friends_model = FriendsModel(db.get_connection())
-    if not friends_model.check_friendship(session["user_id"], author_id):
-        if friends_model.get_friends_ids(author_id):
-            friends_model.add_friend(session["user_id"], author_id)
     
+    if not friends_model.check_friendship(session["user_id"], author_id):
+        if not friends_model.get_friends(author_id):
+            friends_model.add_friend(session["user_id"], author_id)
     return redirect("/users_list")
+
+
+@app.route("/add_new", methods=["GET", "POST"])
+def add_new():
+    if check(): return redirect('/login')
+    
+    news_model = NewsModel(db.get_connection())
+    news_form = AddNewsForm()
+    
+    if news_form.validate_on_submit():
+        title = news_form.title.data
+        content = news_form.content.data
+        news_model.insert(title, content, session['user_id'])
+        return redirect("/index")
+    return render_template("add_new.html", title="Добавить новость", form=news_form)
+  
+        
+def get_news(user_id):
+    news_model = NewsModel(db.get_connection())
+    news = list(map(lambda x: [user_id, x[1], x[2]],
+                    news_model.get_all(user_id)))
+    return news
 
 
 if __name__ == '__main__':

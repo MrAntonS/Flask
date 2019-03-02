@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+	<div class="alert alert-success" role="alert">
+		Подписаться (просто нажмите на ник понравившегося человека)
+	</div>
+	{% if users %}
+	    {% for user in users %}
+	    	<a class="badge badge-pill badge-success" href="/add_friend/{{user[1]}}"> {{user[0]}} </a>
+	    	<br>
+	    {% endfor %}
+	{% else %}
+		<h2><span class="badge badge-pill badge-success">Вы уже подписаны на всех!</span></h2>
+	{% endif %}
+{% endblock %}

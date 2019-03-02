@@ -42,17 +42,7 @@ class NewsModel:
         cursor.close()
         self.connection.commit()
     
-    def update(self, title=None, content=None, news_id=None):
-        if news_id: news_id = int(news_id)
-        cursor = self.connection.cursor()
-        if title:
-            cursor.execute('''UPDATE news SET title = ? WHERE id = ?''', (title, str(news_id)))
-        if content:
-            cursor.execute('''UPDATE news SET content = ? WHERE id = ?''', (content, str(news_id)))
-        cursor.close()
-        self.connection.commit()
-    
-    def get(self,news_id):
+    def get(self, news_id):
         cursor = self.connection.cursor()
         print("ID:",news_id)
         cursor.execute("SELECT * FROM news WHERE id = ?", (str(news_id),))
@@ -62,9 +52,9 @@ class NewsModel:
     def get_all(self, user_id = None):
         cursor = self.connection.cursor()
         if user_id:
-            cursor.execute("SELECT title, user_id FROM news WHERE user_id = ?", (str(user_id),))
+            cursor.execute("SELECT id, title, content FROM news WHERE user_id = ?", (str(user_id),))
         else:
-            cursor.execute("SELECT title, id FROM news")
+            cursor.execute("SELECT id, title, content FROM news")
         rows = cursor.fetchall()
         return rows
     
@@ -118,6 +108,11 @@ class UsersModel:
         rows = cursor.fetchall()
         return rows
     
+    def get_all_ids(self):
+        all_users = self.get_all()
+        all_ids = map(lambda x: x[0], all_users)
+        return list(all_ids)
+    
     def get_name(self, user_id):
         return self.get(user_id)[1]
     pass
@@ -162,14 +157,16 @@ class FriendsModel:
             return True
         return False
     
-    def get_friends_ids(self, user_id):
+    def get_friends(self, user_id):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM friends WHERE sub_id = ?", (str(user_id),))
         row = cursor.fetchall()
         if row:
             return row
         return False        
-    pass    
+    pass 
+
+
 if __name__ == '__main__':
     base = DB("FLASK.db")
     n = NewsModel(base.get_connection())
