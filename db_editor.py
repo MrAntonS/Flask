@@ -44,7 +44,6 @@ class NewsModel:
     
     def get(self, news_id):
         cursor = self.connection.cursor()
-        print("ID:",news_id)
         cursor.execute("SELECT * FROM news WHERE id = ?", (str(news_id),))
         row = cursor.fetchone()
         return row
@@ -52,9 +51,9 @@ class NewsModel:
     def get_all(self, user_id = None):
         cursor = self.connection.cursor()
         if user_id:
-            cursor.execute("SELECT id, title, content FROM news WHERE user_id = ?", (str(user_id),))
+            cursor.execute("SELECT * FROM news WHERE user_id = ?", (str(user_id),))
         else:
-            cursor.execute("SELECT id, title, content FROM news")
+            cursor.execute("SELECT * FROM news")
         rows = cursor.fetchall()
         return rows
     
@@ -115,6 +114,9 @@ class UsersModel:
     
     def get_name(self, user_id):
         return self.get(user_id)[1]
+    
+    def get_id(self, user_name):
+        return self.get(user_name=user_name)[0]
     pass
 
 

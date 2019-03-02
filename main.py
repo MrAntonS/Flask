@@ -94,7 +94,7 @@ def friends_list():
     users_model = UsersModel(db.get_connection())
     friends_ids = friends_model.get_friends(session['user_id'])
 
-    if friends_ids:
+    if friends_ids and str(session['user_id']) != "1":
         friends = map(lambda x: [users_model.get_name(x[2]), x[2]], friends_ids)
         return render_template("friends_list.html", title="Мои друзья", friends=friends, session=session)
     return render_template("friends_list.html", title="Мои друзья", friends=None, session=session)
@@ -133,8 +133,7 @@ def add_friend(author_id):
     friends_model = FriendsModel(db.get_connection())
     
     if not friends_model.check_friendship(session["user_id"], author_id):
-        if not friends_model.get_friends(author_id):
-            friends_model.add_friend(session["user_id"], author_id)
+        friends_model.add_friend(session["user_id"], author_id)
     return redirect("/users_list")
 
 
@@ -150,9 +149,38 @@ def add_new():
         content = news_form.content.data
         news_model.insert(title, content, session['user_id'])
         return redirect("/index")
-    return render_template("add_new.html", title="Добавить новость", form=news_form)
+    return render_template("add_new.html", title="Добавить новость", form=news_form, session=session)
   
-        
+
+@app.route("/del_news")
+def del_news():
+    if check(): return redirect('/login')
+    
+    user_model = UsersModel(db.get_connection())
+    news_model = NewsModel(db.get_connection())
+    lambda_for_jinja = lambda x: [x[1], user_model.get_name(x[3]), x[0]]
+    if str(session['user_id']) == '1':
+        news = list(map(lambda_for_jinja, news_model.get_all()))
+    else:
+        news = list(map(lambda_for_jinja, news_model.get_all(session['user_id'])))
+    return render_template("del_news.html", title="Удалить новости", session=session, news=news)
+
+
+@app.route("/del_news/<int:news_id>")
+def del_new(news_id):
+    if check(): return redirect('/login')
+    
+    news_model = NewsModel(db.get_connection())
+    user_model = UsersModel(db.get_connection())
+    new = news_model.get(news_id)
+    
+    if new:
+        authors_id = new[3]
+        if str(session["user_id"]) == "1" or int(session['user_id']) == authors_id:
+            news_model.delete(news_id)
+    return redirect("/del_news")
+
+
 def get_news(user_id):
     news_model = NewsModel(db.get_connection())
     news = list(map(lambda x: [user_id, x[1], x[2]],

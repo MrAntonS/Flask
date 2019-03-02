@@ -3,7 +3,11 @@
 {% block content %}
 	{%if news%}
 	    {%for new in news%}
-	    	<blockquote class="blockquote">
+	    	{%if new[0] == "admin"%}
+	    		<blockquote class="blockquote bg-warning text-dark">
+	    	{%else%}
+	    		<blockquote class="blockquote">
+	    	{%endif%}
 	    		<p class="mb-0"><h1 class="text-center">{{new[1]}}</h1>{{new[2]}}</p>
 	    		<footer class="blockquote-footer text-right">{{new[0]}}</footer>
 	    	</blockquote>
