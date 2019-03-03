@@ -1,7 +1,6 @@
-from flask import Flask, url_for, request
-from flask import render_template, json, redirect, jsonify
+from flask import Flask
+from flask import render_template, redirect
 from db_editor import DB, NewsModel, UsersModel, FriendsModel
-from flask_restful import reqparse, abort, Api, Resource
 from forms import LoginForm, SignInForm, AddNewsForm
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -36,7 +35,7 @@ def index():
     if news:
         news = map(lambda x: [users_model.get_name(x[0]), x[1], x[2]], news)
     return render_template('index.html', username=session['username'],
-                           news=news, session=session)
+                           news=news, session=session, title="Новости друзей")
 
 
 @app.route('/login', methods=["GET", "POST"])
