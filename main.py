@@ -12,7 +12,10 @@ database = 'FLASK.db'
 
 
 def check():
-    #print("Session:",session)
+    global current_session
+    current_session = {}
+    if "username" in session:
+        current_session['username'] = session['username']
     if 'username' not in session:
         return True
     return False
@@ -36,7 +39,7 @@ def index():
     if news:
         news = map(lambda x: [users_model.get_name(x[0]), x[1], x[2]], news)
     return render_template('index.html', username=session['username'],
-                           news=news, session=session, title="Новости друзей")
+                           news=news, session=current_session, title="Новости друзей")
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -96,8 +99,8 @@ def friends_list():
 
     if friends_ids and str(session['user_id']) != "1":
         friends = map(lambda x: [users_model.get_name(x[2]), x[2]], friends_ids)
-        return render_template("friends_list.html", title="Мои друзья", friends=friends, session=session)
-    return render_template("friends_list.html", title="Мои друзья", friends=None, session=session)
+        return render_template("friends_list.html", title="Мои друзья", friends=friends, session=current_session)
+    return render_template("friends_list.html", title="Мои друзья", friends=None, session=current_session)
 
 
 @app.route("/remove_friend/<int:author_id>")
@@ -123,7 +126,7 @@ def users_list():
     
     users = filter(check_friendship, users_ids)
     users = list(map(lambda x: [users_model.get_name(x), x], users))
-    return render_template("users_list.html", title="С кем бы подружиться?", users=users, session=session)
+    return render_template("users_list.html", title="С кем бы подружиться?", users=users, session=current_session)
 
 
 @app.route("/add_friend/<int:author_id>")
@@ -149,7 +152,7 @@ def add_new():
         content = news_form.content.data
         news_model.insert(title, content, session['user_id'])
         return redirect("/index")
-    return render_template("add_new.html", title="Добавить новость", form=news_form, session=session)
+    return render_template("add_new.html", title="Добавить новость", form=news_form, session=current_session)
   
 
 @app.route("/del_news")
@@ -163,7 +166,7 @@ def del_news():
         news = list(map(lambda_for_jinja, news_model.get_all()))
     else:
         news = list(map(lambda_for_jinja, news_model.get_all(session['user_id'])))
-    return render_template("del_news.html", title="Удалить новости", session=session, news=news)
+    return render_template("del_news.html", title="Удалить новости", session=current_session, news=news)
 
 
 @app.route("/del_news/<int:news_id>")
