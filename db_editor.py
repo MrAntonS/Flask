@@ -51,7 +51,7 @@ class NewsModel:
     def get_all(self, user_id = None):
         cursor = self.connection.cursor()
         if user_id:
-            cursor.execute("SELECT * FROM news WHERE user_id = ?", (str(user_id),))
+            cursor.execute("SELECT * FROM news WHERE user_id = ? ORDER BY id DESC", (str(user_id),))
         else:
             cursor.execute("SELECT * FROM news")
         rows = cursor.fetchall()
