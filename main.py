@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from flask import render_template, redirect
 from db_editor import DB, NewsModel, UsersModel, FriendsModel
 from forms import LoginForm, SignInForm, AddNewsForm
@@ -8,10 +8,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'VERY_SECRET_KEY'
 database = 'FLASK.db'
-session = {}
+
 
 
 def check():
+    #print("Session:",session)
     if 'username' not in session:
         return True
     return False
