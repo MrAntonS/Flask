@@ -14,7 +14,7 @@ class LoginForm(FlaskForm):
 class SignInForm(FlaskForm):
     username = StringField('Придумайте логин', validators=[DataRequired()])
     password = PasswordField('Придумайте пароль', validators=[DataRequired()])
-    submit = SubmitField('Попробуйте зарегестрироваться')
+    submit = SubmitField('Попробуйте зарегистрироваться')
     pass
 
 
